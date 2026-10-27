@@ -27,8 +27,23 @@ void cpu_cycle(void) {
 	printf("%04x\n", opcode);
 	pc += 2;
 	pc %= 4096;
-	if (opcode / 0x1000 == 0x1) {
-		printf("jmp\n");
-		pc = opcode % 0x1000;
+	switch (opcode / 0x1000) {
+		case 0x1:
+			pc = opcode % 0x1000;
+			break;
+		case 0xA:
+			printf("ANNN\n");
+			I = opcode % 0x1000;
+			break;
+		case 0x0:
+			if (opcode == 0x00e0) {
+				memset(buffer, 0, sizeof(buffer));
+			}
+			break;
+		case 0x6:
+			uint8_t X = (opcode / 0x100) % 0x10;
+			uint8_t NN = opcode % 0x100;
+			V[X] = NN;
+			break;
 	}
 }

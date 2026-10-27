@@ -5,7 +5,7 @@
 #include "cpu.h"
 
 int main(int ac, char **av) {
-	if (ac != 2) {
+	if (ac < 2) {
 		printf("Usage: %s [ROM FILE]\n", av[0]);
 		return 1;
 	}	
