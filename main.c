@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "cpu.h"
+#include "display.h"
 
 int main(int ac, char **av) {
 	if (ac < 2) {
@@ -20,14 +21,14 @@ int main(int ac, char **av) {
 
 	GLFWwindow *window = glfwCreateWindow(800, 600, "CHIP8 Emulator", NULL, NULL);
 	glfwMakeContextCurrent(window);
+	glfwSwapInterval(1);
 	
 	gladLoadGL(glfwGetProcAddress);
 	while(!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
-		cpu_cycle();
 
-		glClearColor(0, 0, 0, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
+		for (int i = 0; i < 11; i++) cpu_cycle();
+		display_draw(window);
 
 		glfwSwapBuffers(window);
 	}
