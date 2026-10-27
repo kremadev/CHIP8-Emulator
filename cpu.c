@@ -24,6 +24,11 @@ int cpu_load_rom(const char *path) {
 }
 void cpu_cycle(void) {
 	opcode = memory[pc] * 256 + memory[pc + 1];
+	uint8_t X  = (opcode / 0x100) % 0x10;
+	uint8_t NN = opcode % 0x100;
+	uint8_t Y = (opcode / 0x10) % 0x10;
+	uint8_t N = opcode % 0x10;
+
 	printf("%04x\n", opcode);
 	pc += 2;
 	pc %= 4096;
@@ -32,7 +37,6 @@ void cpu_cycle(void) {
 			pc = opcode % 0x1000;
 			break;
 		case 0xA:
-			printf("ANNN\n");
 			I = opcode % 0x1000;
 			break;
 		case 0x0:
@@ -41,9 +45,26 @@ void cpu_cycle(void) {
 			}
 			break;
 		case 0x6:
-			uint8_t X = (opcode / 0x100) % 0x10;
-			uint8_t NN = opcode % 0x100;
 			V[X] = NN;
 			break;
+		case 0x7:
+			V[X] += NN;
+			break;
+		case 0xD: {
+			uint8_t x = V[X] % 64;
+			uint8_t y = V[Y] % 32;
+			V[0xF] = 0;
+			for (int r = 0; r < N; r++) {
+				uint8_t row = memory[I + r];
+				uint8_t place = 128;
+				for (int col = 0; col < 8; col++) {
+					if ((row / place) % 2 == 1)
+						buffer[(y + r) * 64 + x + col] ^= 1;
+					place /= 2;
+				}
+			}
+			break;
+		}
 	}
 }
+
