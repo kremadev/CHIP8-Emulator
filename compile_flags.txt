@@ -1,0 +1,4 @@
+-Iinclude/glad/include
+-Iinclude/cglm/include
+-Iinclude
+-Iext
