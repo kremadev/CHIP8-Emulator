@@ -27,7 +27,8 @@ int main(int ac, char **av) {
 	while(!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 
-		for (int i = 0; i < 11; i++) cpu_cycle();
+		for (int i = 0; i < 10; i++) cpu_cycle();
+		cpu_tick_timers();
 		display_draw(window);
 
 		glfwSwapBuffers(window);
