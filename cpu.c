@@ -10,6 +10,7 @@ static uint16_t pc = 0x200;
 static uint16_t opcode;
 static uint8_t delay_timer;
 static uint8_t sound_timer;
+uint8_t keypad[16];
 
 static const uint8_t font[80] = {
 	0xF0,0x90,0x90,0x90,0xF0, // 0
@@ -66,15 +67,17 @@ void cpu_cycle(void) {
 			I = NNN;
 			break;
 		case 0x0:
-			if (opcode == 0x00e0) {
-				memset(buffer, 0, sizeof(buffer));
-			} else if (opcode == 0x00ee) {
-				sp--;
-				pc = stack[sp];
-
-			} else {
-				printf("ERROR: Invalid instruction \"%04x\"\n", opcode);
-				exit(1);
+			switch (NNN) {
+				case 0x0e0: 
+					memset(buffer, 0, sizeof(buffer));
+					break;
+				case 0x0ee: 
+					sp--;
+					pc = stack[sp];
+					break;
+				default:
+					printf("ERROR: Invalid instruction \"%04x\"\n", opcode);
+					exit(1);
 			} break;
 		case 0x6:
 			V[X] = NN;
@@ -195,7 +198,32 @@ void cpu_cycle(void) {
 					break;
 				case 0x29:
 					I = 0x50 + V[X] * 5;
-					break; 
+					break;
+				case 0xA:
+					bit = 0;
+					for (int i = 0; i < 16; i++) {
+						if (keypad[i]) {
+							V[X] = i;
+							bit = 1;
+						}
+					}
+					if (!bit) pc -= 2;  
+					break;	
+				default:
+					printf("ERROR: Invalid instruction \"%04x\"\n", opcode);
+					exit(1);
+			} break;
+		case 0xB:
+			pc = NNN + V[0];
+			break;
+		case 0xE:
+			switch (NN) {
+				case 0x9E:
+					if (keypad[V[X]]) pc += 2;
+					break;
+				case 0xA1:
+					if (!keypad[V[X]]) pc += 2;
+					break;
 				default:
 					printf("ERROR: Invalid instruction \"%04x\"\n", opcode);
 					exit(1);

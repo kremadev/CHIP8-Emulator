@@ -8,6 +8,7 @@
 #include <string.h>
 
 extern uint8_t buffer[32*64];
+extern uint8_t keypad[16];
 
 int cpu_load_rom(const char *path); 
 void cpu_cycle(void);
